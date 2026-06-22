@@ -152,6 +152,7 @@ a {
 .primary-action,
 .secondary-action,
 .secondary-link,
+.ghost-action,
 .icon-button,
 .role-tab,
 .request-chip {
@@ -181,6 +182,7 @@ a {
 .primary-action:hover:not(:disabled),
 .secondary-action:hover:not(:disabled),
 .secondary-link:hover,
+.ghost-action:hover,
 .icon-button:hover,
 .role-tab:hover,
 .request-chip:hover,
@@ -193,8 +195,8 @@ a {
   position: relative;
   display: grid;
   align-items: center;
-  min-height: 100svh;
-  padding: 112px 28px 52px;
+  min-height: 96svh;
+  padding: 108px 28px 48px;
   overflow: hidden;
 }
 
@@ -202,6 +204,8 @@ a {
   position: absolute;
   inset: 0;
   z-index: 0;
+  opacity: 0.38;
+  filter: saturate(0.78);
 }
 
 .hero-section::after {
@@ -211,17 +215,17 @@ a {
   pointer-events: none;
   content: "";
   background:
-    linear-gradient(90deg, rgba(0, 11, 36, 0.96) 0%, rgba(18, 25, 43, 0.76) 42%, rgba(18, 25, 43, 0.2) 100%),
-    linear-gradient(180deg, transparent 62%, #000b24 100%);
+    linear-gradient(90deg, rgba(0, 11, 36, 0.98) 0%, rgba(0, 11, 36, 0.9) 40%, rgba(18, 25, 43, 0.32) 100%),
+    linear-gradient(180deg, transparent 66%, #000b24 100%);
 }
 
 .hero-grid {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(460px, 0.62fr);
-  gap: 36px;
-  align-items: start;
+  grid-template-columns: minmax(0, 0.96fr) minmax(420px, 0.56fr);
+  gap: 46px;
+  align-items: center;
   width: min(1320px, 100%);
   margin: 0 auto;
 }
@@ -249,12 +253,12 @@ p {
 }
 
 h1 {
-  max-width: 680px;
-  margin-bottom: 20px;
+  max-width: 840px;
+  margin-bottom: 18px;
   color: var(--ink);
-  font-size: clamp(52px, 6.45vw, 88px);
+  font-size: clamp(50px, 5vw, 74px);
   font-weight: 900;
-  line-height: 0.92;
+  line-height: 0.94;
 }
 
 h2 {
@@ -272,33 +276,54 @@ h3 {
 }
 
 .hero-lede {
-  max-width: 740px;
-  margin-bottom: 16px;
+  max-width: 720px;
+  margin-bottom: 0;
   color: #d5e0e7;
-  font-size: clamp(18px, 1.72vw, 22px);
-  line-height: 1.48;
+  font-size: clamp(18px, 1.52vw, 21px);
+  line-height: 1.52;
 }
 
-.hero-proof-strip {
-  display: flex;
-  flex-wrap: wrap;
+.hero-ledger {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  max-width: 740px;
-  margin-bottom: 24px;
+  max-width: 760px;
+  margin: 22px 0;
 }
 
-.hero-proof-strip span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 7px 10px;
-  color: var(--teal);
+.hero-ledger-item {
+  min-width: 0;
+  min-height: 82px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(172, 198, 233, 0.095), rgba(172, 198, 233, 0.045)),
+    rgba(0, 11, 36, 0.42);
+  border: 1px solid rgba(172, 198, 233, 0.22);
+  border-radius: 8px;
+}
+
+.hero-ledger-item span,
+.hero-ledger-item small {
+  display: block;
+  color: var(--muted);
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
-  background: rgba(172, 198, 233, 0.08);
-  border: 1px solid rgba(172, 198, 233, 0.24);
-  border-radius: 8px;
+}
+
+.hero-ledger-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  margin: 7px 0 4px;
+  color: var(--ink);
+  font-size: clamp(17px, 1.55vw, 23px);
+  line-height: 1.04;
+}
+
+.hero-ledger-item small {
+  color: var(--teal);
+  font-size: 10px;
+  line-height: 1.25;
 }
 
 .hero-actions {
@@ -312,7 +337,7 @@ h3 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   max-width: 760px;
-  margin-top: 26px;
+  margin-top: 20px;
 }
 
 .story-step {
@@ -321,8 +346,8 @@ h3 {
   justify-items: start;
   gap: 7px;
   min-width: 0;
-  min-height: 118px;
-  padding: 13px;
+  min-height: 92px;
+  padding: 12px;
   color: var(--muted);
   text-align: left;
   background: rgba(172, 198, 233, 0.055);
@@ -332,7 +357,7 @@ h3 {
 
 .story-step.active {
   color: var(--ink);
-  background: linear-gradient(180deg, rgba(47, 87, 140, 0.52), rgba(0, 11, 36, 0.66));
+  background: linear-gradient(180deg, rgba(47, 87, 140, 0.48), rgba(0, 11, 36, 0.7));
   border-color: rgba(172, 198, 233, 0.72);
 }
 
@@ -359,7 +384,8 @@ h3 {
 
 .primary-action,
 .secondary-action,
-.secondary-link {
+.secondary-link,
+.ghost-action {
   min-height: 46px;
   padding: 12px 16px;
   font-weight: 900;
@@ -384,18 +410,24 @@ h3 {
   border-color: var(--line);
 }
 
+.ghost-action {
+  color: var(--teal);
+  background: rgba(172, 198, 233, 0.06);
+  border-color: rgba(172, 198, 233, 0.22);
+}
+
 .mission-console {
   justify-self: end;
   width: 100%;
-  max-width: 560px;
+  max-width: 528px;
   min-width: 0;
-  padding: 14px;
+  padding: 16px;
   background:
-    linear-gradient(180deg, rgba(27, 49, 88, 0.88), rgba(0, 11, 36, 0.92)),
+    linear-gradient(180deg, rgba(27, 49, 88, 0.9), rgba(0, 11, 36, 0.94)),
     rgba(18, 25, 43, 0.9);
-  border: 1px solid rgba(172, 198, 233, 0.36);
+  border: 1px solid rgba(172, 198, 233, 0.34);
   border-radius: 8px;
-  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
   backdrop-filter: blur(18px);
 }
 
@@ -415,13 +447,22 @@ h3 {
 .console-topline strong {
   display: block;
   overflow-wrap: anywhere;
-  font-size: 21px;
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.console-subtitle {
+  max-width: 340px;
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .role-tabs {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
   margin-bottom: 12px;
 }
 
@@ -448,11 +489,11 @@ h3 {
 
 .story-context {
   display: grid;
-  grid-template-columns: 70px 1fr;
+  grid-template-columns: 62px 1fr;
   gap: 12px;
   min-width: 0;
-  padding: 10px;
-  background: rgba(172, 198, 233, 0.07);
+  padding: 11px;
+  background: rgba(172, 198, 233, 0.065);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -483,6 +524,9 @@ h3 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  max-height: 138px;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .request-chip {
@@ -491,7 +535,7 @@ h3 {
   justify-content: start;
   gap: 4px;
   width: 100%;
-  min-height: 60px;
+  min-height: 56px;
   padding: 9px;
   color: var(--muted);
   text-align: left;
@@ -523,8 +567,8 @@ h3 {
   display: grid;
   grid-template-columns: 1.25fr 0.7fr 0.6fr;
   gap: 10px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.045);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -584,9 +628,9 @@ h3 {
 .role-action {
   display: grid;
   gap: 9px;
-  padding: 10px;
+  padding: 11px;
   color: var(--muted);
-  background: rgba(1, 8, 7, 0.34);
+  background: rgba(0, 11, 36, 0.44);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -625,8 +669,8 @@ h3 {
 .proof-panel {
   display: grid;
   gap: 9px;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.28);
+  padding: 11px;
+  background: rgba(0, 11, 36, 0.52);
   border: 1px solid rgba(172, 198, 233, 0.24);
   border-radius: 8px;
 }
@@ -681,6 +725,18 @@ h3 {
   color: var(--ink);
   font-size: 11px;
   line-height: 1.34;
+}
+
+.mission-console .proof-row strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mission-console .code-box code {
+  max-height: 44px;
+  overflow: hidden;
 }
 
 .proof-actions {
@@ -1385,7 +1441,7 @@ textarea:focus {
   gap: 7px;
   padding: 9px;
   color: #f6f7f1;
-  background: #000000;
+  background: #02091a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
 }
@@ -1436,6 +1492,7 @@ textarea:focus {
 
   .mission-console {
     max-width: 760px;
+    justify-self: stretch;
   }
 
   .section-kicker {
@@ -1467,8 +1524,18 @@ textarea:focus {
       linear-gradient(180deg, rgba(0, 11, 36, 0.86) 0%, rgba(18, 25, 43, 0.72) 55%, #000b24 100%);
   }
 
+  .scene-layer {
+    bottom: auto;
+    height: 100svh;
+    max-height: 900px;
+  }
+
   .hero-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   h1 {
@@ -1539,13 +1606,15 @@ textarea:focus {
   }
 
   .story-rail,
-  .story-context {
+  .story-context,
+  .hero-ledger {
     grid-template-columns: 1fr;
   }
 
   .primary-action,
   .secondary-link,
-  .secondary-action {
+  .secondary-action,
+  .ghost-action {
     width: 100%;
   }
 

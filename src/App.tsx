@@ -523,27 +523,35 @@ export default function App() {
           </div>
           <div className="hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow">Arc-native verified aid rail</p>
-              <h1>Private aid payments.</h1>
+              <p className="eyebrow">Arc-native private settlement rail</p>
+              <h1>Verified aid payments for real bills.</h1>
               <p className="hero-lede">
-                SANAD turns urgent medical, rent, school, and utility bills into verified
-                stablecoin settlement flows: encrypted evidence in, provider payout out,
-                dignity preserved.
+                SANAD converts urgent medical, rent, school, and utility obligations into
+                evidence-gated stablecoin settlement. Beneficiary context stays private;
+                Arc records the proof trail; providers receive direct payout.
               </p>
-              <div className="hero-proof-strip" aria-label="SANAD live guarantees">
-                <span>Onchain requests</span>
-                <span>Provider payout</span>
-                <span>Private evidence</span>
+              <div className="hero-ledger" aria-label="Live Arc deployment">
+                {liveStatusCards.map((stat) => (
+                  <div className="hero-ledger-item" key={stat.label}>
+                    <span>{stat.label}</span>
+                    <strong>{stat.value}</strong>
+                    <small>{stat.detail}</small>
+                  </div>
+                ))}
               </div>
               <div className="hero-actions">
-                <button className="primary-action" onClick={runSimulation} type="button">
-                  <Sparkles size={18} aria-hidden="true" />
-                  Run aid flow
-                </button>
-                <a className="secondary-link" href="https://docs.arc.io/" target="_blank" rel="noreferrer">
-                  Arc docs
+                <a className="primary-action" href="#console">
+                  <Wallet size={18} aria-hidden="true" />
+                  Open live console
+                </a>
+                <a className="secondary-link" href={contractExplorerUrl()} target="_blank" rel="noreferrer">
+                  Arcscan proof
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </a>
+                <button className="ghost-action" onClick={runSimulation} type="button">
+                  <Sparkles size={18} aria-hidden="true" />
+                  Trace flow
+                </button>
               </div>
               <StoryRail
                 activeIndex={storyIndex}
@@ -579,20 +587,10 @@ export default function App() {
           </div>
         </section>
 
-        <section className="ticker-band" aria-label="Live protocol state">
-          {liveStatusCards.map((stat) => (
-            <div className="ticker-item" key={stat.label}>
-              <span>{stat.label}</span>
-              <strong>{stat.value}</strong>
-              <small>{stat.detail}</small>
-            </div>
-          ))}
-        </section>
-
         <section className="section-grid" id="protocol">
           <div className="section-kicker">
             <p className="eyebrow">Protocol thesis</p>
-            <h2>Not charity. Verified settlement for real human obligations.</h2>
+            <h2>A settlement layer for bills that need proof, speed, and privacy.</h2>
           </div>
           <div className="thesis-grid">
             <FeatureCard
@@ -663,7 +661,7 @@ export default function App() {
         <section className="console-section" id="console">
           <div className="console-copy">
             <p className="eyebrow">Operator console</p>
-            <h2>Functional aid desk, not a static pitch deck.</h2>
+            <h2>Production-shaped desk for creating, proving, and settling aid requests.</h2>
             <p>
               Create requests, approve evidence, fund escrow, and pay providers through
               SanadProtocol. The console reads onchain state and only sends real Arc transactions.
@@ -975,8 +973,9 @@ function MissionConsole({
     <div className="mission-console" id="live-console">
       <div className="console-topline">
         <div>
-          <p className="eyebrow">Live rescue desk</p>
+          <p className="eyebrow">Arc live proof</p>
           <strong>{consoleTitle}</strong>
+          <p className="console-subtitle">{roleCopy[role].blurb}</p>
         </div>
         {selected ? (
           <StatusPill status={selected.status} />
