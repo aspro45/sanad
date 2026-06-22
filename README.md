@@ -57,17 +57,17 @@ The current deployment has a real Arc Testnet end-to-end proof.
 
 | Step | Contract action | Public proof |
 | --- | --- | --- |
-| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0xf61de4eed17ffeedf929670aecce22c981e0c7c7423e56f3754acf4651716e86) |
-| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0x2a91cd1be193e0c5bebf986bbcf0e53238e1c58ef99fa6493223da78721c502b) |
-| 3 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0xbb97249ff17ce0dbda0dfd74ed17af80f4b135b486a98479277ecd86c5dbdd03) |
-| 4 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x9b0cca39cc13654f3bd81a6aeeaa7dd51b0af2d0c472b89af9301f9427311154) |
-| 5 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0xc1457223334f86d75ca1c6c9cba647d977fbf7f9447d2ada7479983ac9a1f5dc) |
-| 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0x0991b5bb1cfa3b75686eccb63e913dbd8ba00c8e1779ef39189786c01de1f239) |
-| 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0x939c4f39a8a2ee5a508baa2e44ab9cfc6da86e28444a684d3b27ae88a09661d6) |
+| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0xbd063cabd8036f94e0b43152ad8cb35b2d86052485b657e1fd48720b20fef152) |
+| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0xc7d21c434bbb3144c7bf1e4e71ec3165fdd19d0c25d951eeb4b33c17242b90d6) |
+| 3 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0x94be8b05f9268dc877bd08227ad796a8116e24efe4b4afa388b4953939fc1316) |
+| 4 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x297ef02c526e03b06769569697f3fce12b720741f8228d719aa4515ade2665ad) |
+| 5 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0x46a1615b32c5631ba279f80b575fac841688375d8c8e7b2067a78dc2a9c16d05) |
+| 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0xd94cc0f26c24de7794aeef2bde3f4a8ecc963e83d3aa48b95cfa9ee843f78740) |
+| 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0xc4a69d1f7f0108f7f7796858a60dc219c667ff081fa71390ddb9fbb33ddbe3b7) |
 
 Final request state: `Paid`
 
-Request tested: `1`
+Request tested: `2`
 
 Memo shown in app: `SANAD-TST-0001`
 
