@@ -12,7 +12,7 @@ coverage/
 
 # Local tooling
 .vite/
-.vercel/
+.vercel
 .playwright-cli/
 work/
 .codex/
