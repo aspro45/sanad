@@ -92,7 +92,7 @@ Source: https://docs.arc.io/arc/tutorials/batch-usdc-transfers
 
 The dashboard is wired to Arc Testnet with `viem`:
 
-1. Reads `VITE_SANAD_CONTRACT_ADDRESS` from `.env`.
+1. Reads `VITE_SANAD_CONTRACT_ADDRESS` from `.env`, with the public Arc Testnet demo contract as a fallback.
 2. Connects through an injected wallet such as Rabby.
 3. Uses Arc Testnet chain ID `5042002`.
 4. Reads request state from `requestCount`, `getRequestCore`, and `getRequestProof`.
@@ -122,4 +122,4 @@ Arcscan:
 https://testnet.arcscan.app/address/0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09
 ```
 
-The frontend reads this from `VITE_SANAD_CONTRACT_ADDRESS`.
+The frontend reads this from `VITE_SANAD_CONTRACT_ADDRESS`, or falls back to the public demo deployment.

@@ -33,5 +33,6 @@ Use this before publishing or submitting the project.
   - `VITE_ARC_RPC_URL`
   - `VITE_ARC_CHAIN_ID`
   - `VITE_SANAD_CONTRACT_ADDRESS`
+- The public demo contract is also compiled as a fallback for Vercel preview/prod builds.
 - Do not set `ARC_DEPLOYER_PRIVATE_KEY` on a public frontend host.
 - Link the public website to the Arcscan contract page and `docs/demo-proof.md`.

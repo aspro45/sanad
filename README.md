@@ -78,6 +78,8 @@ VITE_ARC_CHAIN_ID=5042002
 VITE_SANAD_CONTRACT_ADDRESS=0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09
 ```
 
+The production build also has the public Arc Testnet contract address as a fallback, so the demo still loads if these Vite variables are not set.
+
 Never set `ARC_DEPLOYER_PRIVATE_KEY` on Vercel. That key is only for local deploy/test scripts.
 
 ## Current demo status
