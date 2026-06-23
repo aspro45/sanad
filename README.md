@@ -1,8 +1,10 @@
 # SANAD Protocol
 
 <p align="center">
-  <strong>Private aid payments on Arc.</strong>
+  <img alt="SANAD private aid rail" src="docs/assets/sanad-hero.png">
 </p>
+
+<h3 align="center">Private aid payments on Arc.</h3>
 
 <p align="center">
   SANAD turns urgent medical, rent, school, and utility bills into verified stablecoin settlement flows:
@@ -10,17 +12,15 @@
 </p>
 
 <p align="center">
-  <a href="https://sanad-arc.vercel.app"><strong>Live Demo</strong></a>
+  <a href="https://sanad-arc.vercel.app"><strong>Live app</strong></a>
   |
-  <a href="https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a"><strong>Arcscan Contract</strong></a>
+  <a href="https://sanad-arc.vercel.app/#blog"><strong>Project blog</strong></a>
   |
-  <a href="docs/demo-proof.md"><strong>Testnet Proof</strong></a>
+  <a href="https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a"><strong>Arcscan contract</strong></a>
   |
-  <a href="docs/architecture.md"><strong>Architecture</strong></a>
-</p>
-
-<p align="center">
-  <img alt="SANAD live Arc aid desk" src="docs/assets/sanad-hero.png">
+  <a href="docs/demo-proof.md"><strong>Testnet proof</strong></a>
+  |
+  <a href="https://x.com/ASPRO_22"><strong>ASPRO on X</strong></a>
 </p>
 
 <p align="center">
@@ -30,30 +30,42 @@
   <img alt="Security boundary" src="https://img.shields.io/badge/Status-Testnet%20MVP-e9a13f?style=for-the-badge">
 </p>
 
-## What SANAD Is
+## The Idea
 
-SANAD is an Arc-native verified aid rail for private essential-bill settlement. It is not a public donation page and it is not an unrestricted cash-transfer app.
+Aid should not force people to publish their crisis.
 
-A beneficiary submits an encrypted bill bundle. A verifier checks the evidence offchain and writes a verification hash onchain. Donors fund the request in stablecoins. The smart contract releases funds only to the approved provider, such as a clinic, pharmacy, school, landlord, or utility.
+SANAD is an Arc-native verified aid rail for essential-bill settlement. A beneficiary can submit a private bill object, an approved verifier can review the evidence offchain, donors can fund the request with stablecoins, and the smart contract can release funds directly to the approved provider.
 
-The chain sees the request state, amount, token, provider, metadata hash, verifier hash, and memo ID. It does not store invoices, medical details, identity documents, diagnosis data, or private notes.
+The public chain sees the settlement facts: provider, token, amount, request status, metadata hash, verifier hash, memo ID, and events. The chain does not store invoices, diagnosis details, ID documents, family identity, or private notes.
 
-## Live Deployment
+## Live Project
 
-| Surface | Value |
+| Surface | Link |
 | --- | --- |
 | Production app | https://sanad-arc.vercel.app |
+| Project blog | https://sanad-arc.vercel.app/#blog |
+| GitHub repo | https://github.com/aspro45/sanad |
+| Founder updates | https://x.com/ASPRO_22 |
+| Arc docs | https://docs.arc.io |
+| Arc faucet | https://faucet.circle.com |
+| Arcscan | https://testnet.arcscan.app |
+
+## Contract Deployment
+
+| Item | Value |
+| --- | --- |
 | Network | Arc Testnet |
 | Chain ID | `5042002` |
 | RPC | `https://rpc.testnet.arc.network` |
-| Explorer | https://testnet.arcscan.app |
 | Contract | `0x222df65e3f6f5840d14b04f352eb647201064d6a` |
+| Contract page | https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a |
 | Deploy tx | `0x585602783a8a32cba8856e4b6f8ffd3e7365c36404684f8b6b2cf13a29b3f462` |
-| Test token | Arc Testnet USDC interface at `0x3600000000000000000000000000000000000000` |
+| Test USDC interface | `0x3600000000000000000000000000000000000000` |
+| Test EURC interface | `0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a` |
 
-## Verified Testnet Run
+## Verified Arc Testnet Run
 
-The current deployment has a real Arc Testnet end-to-end proof.
+This deployment has a real end-to-end lifecycle proof on Arc Testnet. Request `1` was submitted, verified, funded, and paid to the approved provider.
 
 | Step | Contract action | Public proof |
 | --- | --- | --- |
@@ -65,57 +77,56 @@ The current deployment has a real Arc Testnet end-to-end proof.
 | 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0x4512b05e25c1b866f9f90382f32eb94c8f3b5050ad8653fad390ffe3a529cb3b) |
 | 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0xdb2bdc949d99f8d27da54bb3bb5c250c39cd0e6daa117638cd8e89bfab97602d) |
 
-Final request state: `Paid`
+Final state: `Paid`
 
-Request tested: `1`
+Full notes: [`docs/demo-proof.md`](docs/demo-proof.md)
 
-Memo shown in app: `SANAD-TST-0001`
+## Product Experience
 
-Full proof notes: [`docs/demo-proof.md`](docs/demo-proof.md)
+The live website is built as a usable protocol surface, not only a landing page.
 
-## Why Arc
-
-SANAD is designed around payment operations, not speculation.
-
-| Arc capability | Why SANAD needs it |
+| Area | What it does |
 | --- | --- |
-| USDC-native fees | Aid operations can be budgeted in the same unit donors fund with. |
-| Fast deterministic settlement | Providers can reconcile payouts quickly after funding completes. |
-| Transaction memos | Every request can carry a searchable operational reference. |
-| App Kits path | Bridge, send, swap, and balance flows map naturally to aid desks. |
-| Future privacy path | The MVP keeps evidence encrypted offchain today and can adopt stronger Arc privacy primitives later. |
+| Private bill desk | Creates a request with category, provider, token, amount, deadline, and private note context. |
+| Arc rail console | Reads live request data from the deployed Arc Testnet contract. |
+| Proof packet | Shows metadata hash, verifier hash, memo ID, contract address, and Arcscan route. |
+| Relief areas | Explains medical, housing, school, and utilities support with visual cards. |
+| Protocol blog | Explains the problem, the Arc architecture, privacy boundary, and testnet proof. |
+| Footer hub | Points users to GitHub, README, Arcscan, Arc docs, and ASPRO on X. |
 
-## How The Protocol Works
+## Protocol Flow
 
 ```mermaid
 flowchart LR
-  Beneficiary["Beneficiary<br/>encrypted evidence"]
-  Verifier["Verifier<br/>offchain review"]
-  Donor["Donor<br/>USDC or EURC"]
-  Contract["SanadProtocol<br/>Arc Testnet escrow"]
-  Provider["Approved provider<br/>clinic, school, landlord, utility"]
-  Arcscan["Arcscan<br/>events, hashes, memo IDs"]
+  Beneficiary["Beneficiary<br/>private bill object"]
+  Evidence["Encrypted evidence<br/>kept offchain"]
+  Verifier["Approved verifier<br/>hashes review"]
+  Donor["Donor<br/>funds USDC or EURC"]
+  Contract["SanadProtocol<br/>Arc escrow"]
+  Provider["Approved provider<br/>receives payout"]
+  Arcscan["Arcscan<br/>events and proof"]
 
+  Beneficiary --> Evidence
   Beneficiary -->|submitRequest| Contract
-  Verifier -->|verifyRequest / rejectRequest| Contract
+  Verifier -->|verifyRequest| Contract
   Donor -->|fundRequest| Contract
   Contract -->|payProvider| Provider
-  Contract -->|public proof| Arcscan
+  Contract --> Arcscan
 ```
 
-## Request Lifecycle
+## Request States
 
 | Status | Meaning |
 | --- | --- |
-| `Submitted` | A beneficiary created an aid object with provider, token, amount, memo ID, and metadata hash. |
-| `Verified` | An approved verifier checked offchain evidence and stored a verification hash. |
+| `Submitted` | A beneficiary created a request with provider, token, amount, memo ID, and metadata hash. |
+| `Verified` | An approved verifier checked offchain evidence and posted a verification hash. |
 | `Funded` | Donors fully funded the escrow amount. |
 | `Paid` | The approved provider received the payout. |
 | `Rejected` | A verifier rejected the request with a private reason hash. |
 | `Cancelled` | The beneficiary cancelled before verification. |
 | `Refunded` | Donors reclaimed funds from an expired request. |
 
-## Contract Surface
+## Smart Contract Surface
 
 `contracts/SanadProtocol.sol` includes:
 
@@ -129,7 +140,7 @@ flowchart LR
 - Reentrancy guard around token movement.
 - Safe ERC-20 transfer handling for tokens that return `false`, revert, or return no boolean.
 
-Core read functions:
+Core reads:
 
 ```solidity
 requestCount()
@@ -140,7 +151,7 @@ approvedProviders(address provider)
 approvedVerifiers(address verifier)
 ```
 
-Core write functions:
+Core writes:
 
 ```solidity
 setProvider(address provider, bool approved)
@@ -153,20 +164,19 @@ payProvider(uint256 requestId)
 refundExpired(uint256 requestId)
 ```
 
-## Repository Map
+## Why Arc
 
-| Path | Purpose |
+SANAD is designed around payment operations, reconciliation, and public proof.
+
+| Arc capability | Why SANAD uses it |
 | --- | --- |
-| `contracts/SanadProtocol.sol` | Solidity contract for verified aid escrow and provider payout. |
-| `src/` | React/Vite frontend connected to Arc Testnet through `viem`. |
-| `src/sanadContract.ts` | Wallet, contract reads, writes, metadata hashes, and explorer helpers. |
-| `scripts/deploy-arc.mjs` | Compiles with optimizer + `viaIR`, deploys to Arc, and writes the address to `.env`. |
-| `scripts/test-arc-contract.mjs` | Runs the live Arc Testnet lifecycle proof. |
-| `scripts/check-repo-safe.mjs` | Scans the repo for private-key style secrets before pushing. |
-| `docs/` | Product, architecture, integration, deployment, security, and proof notes. |
-| `vercel.json` | Production deployment settings for Vite on Vercel. |
+| Stablecoin-native settlement | Aid requests can be priced, funded, and reconciled in the same unit. |
+| Fast finality | Providers can receive payouts quickly after funding completes. |
+| Arcscan visibility | Donors and operators can verify public state without seeing private documents. |
+| App Kits path | Wallet, send, balance, and operational flows map naturally to an aid desk. |
+| Privacy roadmap | The MVP stores hashes today and can adopt stronger privacy primitives later. |
 
-## Quick Start
+## Run Locally
 
 ```bash
 npm install
@@ -174,22 +184,57 @@ copy .env.example .env
 npm run dev
 ```
 
-Open the local Vite URL, connect Rabby or another injected wallet, and switch to Arc Testnet.
+Open the Vite URL and connect Rabby or another injected wallet on Arc Testnet.
 
-Useful commands:
+Public frontend values:
+
+```text
+VITE_ARC_RPC_URL=https://rpc.testnet.arc.network
+VITE_ARC_CHAIN_ID=5042002
+VITE_SANAD_CONTRACT_ADDRESS=0x222df65e3f6f5840d14b04f352eb647201064d6a
+```
+
+Private deployment/testing value:
+
+```text
+ARC_DEPLOYER_PRIVATE_KEY=0x...
+```
+
+Keep `.env` private. Never commit a real key.
+
+## Quality Checks
 
 ```bash
 npm run build
 npm run check:repo-safe
-npm run deploy:arc
+npm audit
+npm run test:contract:local
+```
+
+Live Arc Testnet proof:
+
+```bash
 npm run test:arc-contract
 ```
 
-`npm run test:arc-contract` uses `ARC_DEPLOYER_PRIVATE_KEY` from `.env`. Keep `.env` private and never commit a real key.
+`npm run test:arc-contract` requires `ARC_DEPLOYER_PRIVATE_KEY` in `.env` and prints public transaction hashes only.
 
-## Vercel Deployment
+## Deploy Contract
 
-The public production app is live at:
+```bash
+npm run deploy:arc
+```
+
+The deploy script:
+
+1. Compiles `contracts/SanadProtocol.sol` with optimizer and `viaIR`.
+2. Deploys to Arc Testnet.
+3. Writes the new contract address to `.env`.
+4. Prints the Arcscan transaction link.
+
+## Deploy Frontend
+
+Production:
 
 ```text
 https://sanad-arc.vercel.app
@@ -204,35 +249,41 @@ Build: npm run build
 Output: dist
 ```
 
-Public frontend environment variables:
+Set only public `VITE_` variables in Vercel. Do not set `ARC_DEPLOYER_PRIVATE_KEY` in Vercel.
 
-```text
-VITE_ARC_RPC_URL=https://rpc.testnet.arc.network
-VITE_ARC_CHAIN_ID=5042002
-VITE_SANAD_CONTRACT_ADDRESS=0x222df65e3f6f5840d14b04f352eb647201064d6a
-```
+## Repository Map
 
-The production bundle also contains the public Arc Testnet contract address as a fallback, so the demo still loads if Vite environment variables are not set.
-
-Never set `ARC_DEPLOYER_PRIVATE_KEY` on Vercel.
+| Path | Purpose |
+| --- | --- |
+| `contracts/SanadProtocol.sol` | Solidity contract for verified aid escrow and provider payout. |
+| `outputs/SanadProtocol_RemixReady.sol` | Single-file Remix copy of the contract. |
+| `src/` | React/Vite frontend connected to Arc Testnet through `viem`. |
+| `src/sanadContract.ts` | Contract reads, writes, wallet calls, hashes, and explorer helpers. |
+| `scripts/deploy-arc.mjs` | Arc Testnet deployment script. |
+| `scripts/test-arc-contract.mjs` | Live Arc Testnet lifecycle proof script. |
+| `scripts/test-contract-local.mjs` | Local runtime contract tests with Ganache. |
+| `scripts/check-repo-safe.mjs` | Private-key style secret scan before pushing. |
+| `docs/` | Architecture, Arc integration, security model, deployment checklist, and proof notes. |
+| `public/` | Production visual assets used by the website. |
+| `vercel.json` | Vite deployment settings for Vercel. |
 
 ## Security Boundary
 
-This repository is ready for testnet demos, hackathons, grants, and technical review. It is not a mainnet audited financial product.
+SANAD is ready for Arc Testnet demos, hackathons, grant review, and technical feedback. It is not a mainnet audited financial product.
 
-Already implemented:
+Implemented now:
 
-- `.env` ignored and excluded from GitHub.
-- `npm audit` passed with `0 vulnerabilities` at publication time.
-- `check:repo-safe` scans for private-key style secrets.
+- `.env` is ignored and excluded from GitHub.
+- `check:repo-safe` scans the repo for private-key style secrets.
 - Contract stores hashes and memo IDs, not raw private evidence.
 - Provider and verifier roles are allowlisted.
-- Token movements use a reentrancy guard.
+- Token movement uses a reentrancy guard.
+- Local contract tests cover owner checks, allowlists, submit, verify, fund, payout, cancel, reject, and refund paths.
 
 Required before real funds:
 
 - Independent smart-contract audit.
-- Unit and fuzz tests for every transition.
+- Expanded unit, fuzz, and invariant tests.
 - Multisig or timelocked owner.
 - Emergency pause and request limits.
 - Multi-verifier approval for high-value or sensitive requests.
@@ -242,14 +293,12 @@ Required before real funds:
 
 | Stage | Focus |
 | --- | --- |
-| MVP | Arc Testnet contract, live dashboard, verified request lifecycle. |
-| Operator beta | Provider onboarding, verifier reputation, request search, audit exports. |
-| Privacy beta | Encrypted evidence vault, salted canonical bundles, selective disclosure. |
-| Scale | NGO batch operations, duplicate-invoice detection, grant reporting, provider analytics. |
+| MVP | Arc Testnet contract, live dashboard, verified request lifecycle, project blog. |
+| Operator beta | Provider onboarding, verifier reputation, request search, CSV exports, grant dashboards. |
+| Privacy beta | Encrypted evidence vault, canonical evidence bundles, selective disclosure. |
+| Scale | NGO batch operations, duplicate-invoice detection, provider analytics, field workflows. |
 | Production | Audit, multisig governance, incident response, compliance playbooks. |
 
-## Project Thesis
+## License
 
-Aid should not force people to publish their crisis.
-
-SANAD makes essential-bill support verifiable for donors, operational for providers, and private for beneficiaries. The protocol keeps human context offchain, puts settlement guarantees onchain, and uses Arc as the payment layer for a new class of private, auditable aid rails.
+MIT
