@@ -111,7 +111,7 @@ const statusLabels: SanadStatus[] = [
 ];
 const categories: SanadCategory[] = ["Medical", "Rent", "School", "Utilities", "Food"];
 const tokenAddresses = ARC_TESTNET.tokens as Record<SanadToken, Address>;
-const defaultSanadContractAddress = "0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09";
+const defaultSanadContractAddress = "0x222df65e3f6f5840d14b04f352eb647201064d6a";
 
 export const SANAD_CONTRACT_ADDRESS = normalizeOptionalAddress(
   import.meta.env.VITE_SANAD_CONTRACT_ADDRESS ?? defaultSanadContractAddress,

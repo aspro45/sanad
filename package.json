@@ -7,17 +7,17 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc && vite build",
     "check:repo-safe": "node scripts/check-repo-safe.mjs",
+    "test:contract:local": "node scripts/test-contract-local.mjs",
     "deploy:arc": "node scripts/deploy-arc.mjs",
     "test:arc-contract": "node scripts/test-arc-contract.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
-    "@react-three/fiber": "^8.17.10",
     "@vitejs/plugin-react": "^5.1.1",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.184.0",
     "viem": "^2.53.1",
     "vite": "^8.0.16"
   },
@@ -28,7 +28,6 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@types/three": "^0.184.1",
     "solc": "^0.8.35",
     "typescript": "^5.6.3"
   }

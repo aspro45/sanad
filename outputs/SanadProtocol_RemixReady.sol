@@ -249,6 +249,8 @@ contract SanadProtocol {
 
         if (aidRequest.fundedAmount == 0) {
             aidRequest.status = RequestStatus.Refunded;
+        } else if (aidRequest.fundedAmount < aidRequest.requestedAmount) {
+            aidRequest.status = RequestStatus.Verified;
         }
 
         emit RequestRefunded(requestId, msg.sender, contribution);

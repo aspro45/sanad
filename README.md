@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://sanad-arc.vercel.app"><strong>Live Demo</strong></a>
   |
-  <a href="https://testnet.arcscan.app/address/0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09"><strong>Arcscan Contract</strong></a>
+  <a href="https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a"><strong>Arcscan Contract</strong></a>
   |
   <a href="docs/demo-proof.md"><strong>Testnet Proof</strong></a>
   |
@@ -47,8 +47,8 @@ The chain sees the request state, amount, token, provider, metadata hash, verifi
 | Chain ID | `5042002` |
 | RPC | `https://rpc.testnet.arc.network` |
 | Explorer | https://testnet.arcscan.app |
-| Contract | `0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09` |
-| Deploy tx | `0x1f522810110d87114927c891a1bebf615b76751c30fbd1e30b49e2985c7e65e1` |
+| Contract | `0x222df65e3f6f5840d14b04f352eb647201064d6a` |
+| Deploy tx | `0x585602783a8a32cba8856e4b6f8ffd3e7365c36404684f8b6b2cf13a29b3f462` |
 | Test token | Arc Testnet USDC interface at `0x3600000000000000000000000000000000000000` |
 
 ## Verified Testnet Run
@@ -57,17 +57,17 @@ The current deployment has a real Arc Testnet end-to-end proof.
 
 | Step | Contract action | Public proof |
 | --- | --- | --- |
-| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0xbd063cabd8036f94e0b43152ad8cb35b2d86052485b657e1fd48720b20fef152) |
-| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0xc7d21c434bbb3144c7bf1e4e71ec3165fdd19d0c25d951eeb4b33c17242b90d6) |
-| 3 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0x94be8b05f9268dc877bd08227ad796a8116e24efe4b4afa388b4953939fc1316) |
-| 4 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x297ef02c526e03b06769569697f3fce12b720741f8228d719aa4515ade2665ad) |
-| 5 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0x46a1615b32c5631ba279f80b575fac841688375d8c8e7b2067a78dc2a9c16d05) |
-| 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0xd94cc0f26c24de7794aeef2bde3f4a8ecc963e83d3aa48b95cfa9ee843f78740) |
-| 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0xc4a69d1f7f0108f7f7796858a60dc219c667ff081fa71390ddb9fbb33ddbe3b7) |
+| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0x5292221167cb3c9a8a1adab7374196d1a1f927ceed90f0c1971ea964cc2f1126) |
+| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0xe7408d81c48269a9494a8f22bf3703a6ddf80ecad6bd6dd2c61709848745b254) |
+| 3 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0x4be79509e05c854ea7cb734b15cbdac4752ada196c6f55ad6afb68c70b96baf7) |
+| 4 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x161baa463188f487289aeec408343e6271f8d894effeb815e2318745ff2a8367) |
+| 5 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0xf4f05308d513acfd87abff18e85012db0cb41360a97fb7e98273b18086ba2be2) |
+| 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0x4512b05e25c1b866f9f90382f32eb94c8f3b5050ad8653fad390ffe3a529cb3b) |
+| 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0xdb2bdc949d99f8d27da54bb3bb5c250c39cd0e6daa117638cd8e89bfab97602d) |
 
 Final request state: `Paid`
 
-Request tested: `2`
+Request tested: `1`
 
 Memo shown in app: `SANAD-TST-0001`
 
@@ -209,7 +209,7 @@ Public frontend environment variables:
 ```text
 VITE_ARC_RPC_URL=https://rpc.testnet.arc.network
 VITE_ARC_CHAIN_ID=5042002
-VITE_SANAD_CONTRACT_ADDRESS=0xa57dd3b2e5980246ecb6b1c41ff4415066e32f09
+VITE_SANAD_CONTRACT_ADDRESS=0x222df65e3f6f5840d14b04f352eb647201064d6a
 ```
 
 The production bundle also contains the public Arc Testnet contract address as a fallback, so the demo still loads if Vite environment variables are not set.
