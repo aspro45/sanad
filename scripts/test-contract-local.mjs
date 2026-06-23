@@ -118,6 +118,9 @@ async function runTests() {
     true,
   ]);
   await write("approve verifier", ownerClient, protocolAddress, protocol.abi, "setVerifier", [verifier.address, true]);
+  await expectRevert("non-owner cannot approve token", () =>
+    write("bad setToken", outsiderClient, protocolAddress, protocol.abi, "setToken", [tokenAddress, true, 1000n]),
+  );
   assertEq(
     await read(protocolAddress, protocol.abi, "approvedProviders", [providerAccount.address]),
     true,
@@ -128,12 +131,16 @@ async function runTests() {
     true,
     "verifier allowlist",
   );
+  await expectRevert("missing request cannot be rejected", () =>
+    write("reject missing", verifierClient, protocolAddress, protocol.abi, "rejectRequest", [999n, hash("reason")]),
+  );
 
   const amount = 100n;
-  const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
+  const deadline = BigInt(Math.floor(Date.now() / 1000) + 7200);
   const category = stringToHex("Medical", { size: 32 });
   const metadataHash = hash("metadata-1");
   const memoId = stringToHex("SANAD-LOCAL-0001", { size: 32 });
+  const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
   await expectRevert("unapproved provider rejected", () =>
     write("bad submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
@@ -146,6 +153,66 @@ async function runTests() {
       deadline,
     ]),
   );
+  await expectRevert("unapproved token rejected", () =>
+    write("bad token submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
+      providerAccount.address,
+      tokenAddress,
+      amount,
+      category,
+      metadataHash,
+      memoId,
+      deadline,
+    ]),
+  );
+  await write("approve token", ownerClient, protocolAddress, protocol.abi, "setToken", [tokenAddress, true, 1000n]);
+  assertEq(await read(protocolAddress, protocol.abi, "approvedTokens", [tokenAddress]), true, "token allowlist");
+  assertEq(await read(protocolAddress, protocol.abi, "tokenMaxRequestAmount", [tokenAddress]), 1000n, "token cap stored");
+  await expectRevert("oversized request rejected", () =>
+    write("oversized submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
+      providerAccount.address,
+      tokenAddress,
+      1001n,
+      category,
+      metadataHash,
+      memoId,
+      deadline,
+    ]),
+  );
+  await expectRevert("zero metadata rejected", () =>
+    write("zero metadata submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
+      providerAccount.address,
+      tokenAddress,
+      amount,
+      category,
+      zeroHash,
+      memoId,
+      deadline,
+    ]),
+  );
+  await expectRevert("short deadline rejected", () =>
+    write("short deadline submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
+      providerAccount.address,
+      tokenAddress,
+      amount,
+      category,
+      metadataHash,
+      memoId,
+      BigInt(Math.floor(Date.now() / 1000) + 120),
+    ]),
+  );
+  await write("pause protocol", ownerClient, protocolAddress, protocol.abi, "setPaused", [true]);
+  await expectRevert("paused submit rejected", () =>
+    write("paused submit", beneficiaryClient, protocolAddress, protocol.abi, "submitRequest", [
+      providerAccount.address,
+      tokenAddress,
+      amount,
+      category,
+      metadataHash,
+      memoId,
+      deadline,
+    ]),
+  );
+  await write("unpause protocol", ownerClient, protocolAddress, protocol.abi, "setPaused", [false]);
 
   const requestId = await submitRequest(
     beneficiaryClient,
@@ -162,6 +229,9 @@ async function runTests() {
 
   await expectRevert("non-verifier cannot verify", () =>
     write("bad verify", outsiderClient, protocolAddress, protocol.abi, "verifyRequest", [requestId, hash("bad")]),
+  );
+  await expectRevert("zero verification hash rejected", () =>
+    write("zero verify", verifierClient, protocolAddress, protocol.abi, "verifyRequest", [requestId, zeroHash]),
   );
   await write("verify request", verifierClient, protocolAddress, protocol.abi, "verifyRequest", [
     requestId,
@@ -190,7 +260,7 @@ async function runTests() {
     write("bad pay", outsiderClient, protocolAddress, protocol.abi, "payProvider", [requestId]),
   );
 
-  await rpc("evm_increaseTime", [3700]);
+  await rpc("evm_increaseTime", [8000]);
   await rpc("evm_mine", []);
 
   await write("donor A refund expired", donorAClient, protocolAddress, protocol.abi, "refundExpired", [requestId]);
@@ -211,7 +281,7 @@ async function runTests() {
     providerAccount.address,
     tokenAddress,
     75n,
-    BigInt(Math.floor(Date.now() / 1000) + 7200),
+    BigInt(Math.floor(Date.now() / 1000) + 20000),
     "0002",
   );
   await write("verify pay request", verifierClient, protocolAddress, protocol.abi, "verifyRequest", [
@@ -232,7 +302,7 @@ async function runTests() {
     providerAccount.address,
     tokenAddress,
     20n,
-    BigInt(Math.floor(Date.now() / 1000) + 7200),
+    BigInt(Math.floor(Date.now() / 1000) + 20000),
     "0003",
   );
   await write("beneficiary cancels submitted request", beneficiaryClient, protocolAddress, protocol.abi, "cancelRequest", [
@@ -252,8 +322,11 @@ async function runTests() {
     providerAccount.address,
     tokenAddress,
     25n,
-    BigInt(Math.floor(Date.now() / 1000) + 7200),
+    BigInt(Math.floor(Date.now() / 1000) + 20000),
     "0004",
+  );
+  await expectRevert("zero reject hash rejected", () =>
+    write("zero reject", verifierClient, protocolAddress, protocol.abi, "rejectRequest", [rejectRequestId, zeroHash]),
   );
   await write("verifier rejects request", verifierClient, protocolAddress, protocol.abi, "rejectRequest", [
     rejectRequestId,
@@ -265,6 +338,27 @@ async function runTests() {
   await expectRevert("rejected request cannot be funded", () =>
     write("fund rejected", donorBClient, protocolAddress, protocol.abi, "fundRequest", [rejectRequestId, 25n]),
   );
+  await expectRevert("non-owner cannot transfer ownership", () =>
+    write("bad transfer owner", outsiderClient, protocolAddress, protocol.abi, "transferOwnership", [
+      outsider.address,
+    ]),
+  );
+  await write("start ownership transfer", ownerClient, protocolAddress, protocol.abi, "transferOwnership", [
+    outsider.address,
+  ]);
+  assertEq(
+    (await read(protocolAddress, protocol.abi, "pendingOwner", [])).toLowerCase(),
+    outsider.address.toLowerCase(),
+    "pending owner stored",
+  );
+  await write("accept ownership", outsiderClient, protocolAddress, protocol.abi, "acceptOwnership", []);
+  assertEq(
+    (await read(protocolAddress, protocol.abi, "owner", [])).toLowerCase(),
+    outsider.address.toLowerCase(),
+    "ownership transferred",
+  );
+  await write("new owner can pause", outsiderClient, protocolAddress, protocol.abi, "setPaused", [true]);
+  assertEq(await read(protocolAddress, protocol.abi, "paused", []), true, "paused by new owner");
 
   console.log("All local SanadProtocol runtime tests passed.");
 }

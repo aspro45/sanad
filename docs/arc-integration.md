@@ -112,14 +112,14 @@ Show the request events on Arcscan and the dashboard audit feed.
 ## Current deployment
 
 ```text
-SanadProtocol: 0x222df65e3f6f5840d14b04f352eb647201064d6a
+SanadProtocol: 0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03
 Deploy tx:      0x585602783a8a32cba8856e4b6f8ffd3e7365c36404684f8b6b2cf13a29b3f462
 ```
 
 Arcscan:
 
 ```text
-https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a
+https://testnet.arcscan.app/address/0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03
 ```
 
 The frontend reads this from `VITE_SANAD_CONTRACT_ADDRESS`, or falls back to the public demo deployment.

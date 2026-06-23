@@ -11,6 +11,9 @@ React dashboard
 Solidity contract
   -> provider registry
   -> verifier registry
+  -> token registry and request caps
+  -> emergency pause
+  -> two-step ownership
   -> aid request lifecycle
   -> ERC-20 escrow
   -> direct provider payout
@@ -23,6 +26,9 @@ Solidity contract
 
 - approved providers
 - approved verifiers
+- approved tokens and per-token request caps
+- emergency pause for sensitive state transitions
+- two-step ownership transfer
 - request submission
 - verification and rejection
 - partial donor funding
@@ -112,3 +118,6 @@ AidRequest
 - Do not call the product a bank, insurance product, or medical provider.
 - Do not promise regulatory compliance without jurisdiction-specific review.
 - Use provider allowlists before direct settlement.
+- Use token allowlists and request caps before accepting funds.
+- Keep owner behind a multisig or timelock before production.
+- Keep refunds callable after expiry so donors are not trapped by an emergency pause.

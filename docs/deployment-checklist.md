@@ -16,6 +16,10 @@ Use this before publishing or submitting the project.
 - Deploy transaction is public in README.
 - End-to-end test proof is in `docs/demo-proof.md`.
 - `npm run test:arc-contract` passes on Arc Testnet.
+- Approved provider, verifier, and token allowlist transactions are public.
+- Token max request cap is configured for the demo token.
+- Emergency pause has been tested locally.
+- Two-step ownership transfer has been tested locally.
 
 ## Frontend proof
 
@@ -23,6 +27,7 @@ Use this before publishing or submitting the project.
 - `vercel.json` points Vercel to the Vite build and `dist` output.
 - `.vercelignore` blocks local secrets and tooling folders from local Vercel uploads.
 - `VITE_SANAD_CONTRACT_ADDRESS` points to the deployed contract.
+- The deployed contract has the frontend demo token approved through `setToken`.
 - Rabby is connected to Arc Testnet.
 - A wallet with testnet USDC can submit, verify, fund, and pay a request.
 

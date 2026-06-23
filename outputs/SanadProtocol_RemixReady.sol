@@ -67,9 +67,18 @@ contract SanadProtocol {
     error DeadlinePassed();
     error NotExpired();
     error TransferLocked();
+    error InvalidRequest();
+    error InvalidHash();
+    error Paused();
+    error TokenNotApproved();
+    error RequestTooLarge();
 
+    event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event PausedUpdated(bool paused);
     event VerifierUpdated(address indexed verifier, bool approved);
     event ProviderUpdated(address indexed provider, bool approved);
+    event TokenUpdated(address indexed token, bool approved, uint256 maxRequestAmount);
     event RequestSubmitted(uint256 indexed requestId, address indexed beneficiary, address indexed provider);
     event RequestVerified(
         uint256 indexed requestId,
@@ -87,11 +96,17 @@ contract SanadProtocol {
     event RequestRefunded(uint256 indexed requestId, address indexed recipient, uint256 amount);
 
     address public owner;
+    address public pendingOwner;
     uint256 public requestCount;
+    uint256 public constant MIN_DEADLINE_DELAY = 1 hours;
+    uint256 public constant MAX_DEADLINE_DELAY = 90 days;
+    bool public paused;
     bool private locked;
 
     mapping(address => bool) public approvedVerifiers;
     mapping(address => bool) public approvedProviders;
+    mapping(address => bool) public approvedTokens;
+    mapping(address => uint256) public tokenMaxRequestAmount;
     mapping(uint256 => AidRequest) private requests;
     mapping(uint256 => mapping(address => uint256)) public contributions;
 
@@ -105,6 +120,11 @@ contract SanadProtocol {
         _;
     }
 
+    modifier whenNotPaused() {
+        if (paused) revert Paused();
+        _;
+    }
+
     modifier nonReentrant() {
         if (locked) revert TransferLocked();
         locked = true;
@@ -115,6 +135,26 @@ contract SanadProtocol {
     constructor(address initialOwner) {
         if (initialOwner == address(0)) revert InvalidAddress();
         owner = initialOwner;
+        emit OwnershipTransferred(address(0), initialOwner);
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert InvalidAddress();
+        pendingOwner = newOwner;
+        emit OwnershipTransferStarted(owner, newOwner);
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert NotOwner();
+        address previousOwner = owner;
+        owner = msg.sender;
+        pendingOwner = address(0);
+        emit OwnershipTransferred(previousOwner, msg.sender);
+    }
+
+    function setPaused(bool shouldPause) external onlyOwner {
+        paused = shouldPause;
+        emit PausedUpdated(shouldPause);
     }
 
     function setVerifier(address verifier, bool approved) external onlyOwner {
@@ -129,6 +169,14 @@ contract SanadProtocol {
         emit ProviderUpdated(provider, approved);
     }
 
+    function setToken(address token, bool approved, uint256 maxRequestAmount) external onlyOwner {
+        if (token == address(0)) revert InvalidAddress();
+        if (approved && maxRequestAmount == 0) revert InvalidAmount();
+        approvedTokens[token] = approved;
+        tokenMaxRequestAmount[token] = approved ? maxRequestAmount : 0;
+        emit TokenUpdated(token, approved, approved ? maxRequestAmount : 0);
+    }
+
     function submitRequest(
         address provider,
         address token,
@@ -137,11 +185,16 @@ contract SanadProtocol {
         bytes32 metadataHash,
         bytes32 memoId,
         uint256 deadline
-    ) external returns (uint256 requestId) {
+    ) external whenNotPaused returns (uint256 requestId) {
         if (!approvedProviders[provider]) revert NotProvider();
-        if (token == address(0)) revert InvalidAddress();
+        if (!approvedTokens[token]) revert TokenNotApproved();
         if (amount == 0) revert InvalidAmount();
-        if (deadline <= block.timestamp) revert InvalidDeadline();
+        if (amount > tokenMaxRequestAmount[token]) revert RequestTooLarge();
+        if (category == bytes32(0) || metadataHash == bytes32(0) || memoId == bytes32(0)) revert InvalidHash();
+        if (
+            deadline < block.timestamp + MIN_DEADLINE_DELAY ||
+            deadline > block.timestamp + MAX_DEADLINE_DELAY
+        ) revert InvalidDeadline();
 
         requestId = ++requestCount;
         requests[requestId] = AidRequest({
@@ -163,10 +216,12 @@ contract SanadProtocol {
         emit RequestSubmitted(requestId, msg.sender, provider);
     }
 
-    function verifyRequest(uint256 requestId, bytes32 verificationHash) external onlyVerifier {
+    function verifyRequest(uint256 requestId, bytes32 verificationHash) external onlyVerifier whenNotPaused {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (aidRequest.status != RequestStatus.Submitted) revert InvalidStatus();
         if (block.timestamp > aidRequest.deadline) revert DeadlinePassed();
+        if (verificationHash == bytes32(0)) revert InvalidHash();
 
         aidRequest.verifier = msg.sender;
         aidRequest.verificationHash = verificationHash;
@@ -175,9 +230,11 @@ contract SanadProtocol {
         emit RequestVerified(requestId, msg.sender, verificationHash);
     }
 
-    function rejectRequest(uint256 requestId, bytes32 reasonHash) external onlyVerifier {
+    function rejectRequest(uint256 requestId, bytes32 reasonHash) external onlyVerifier whenNotPaused {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (aidRequest.status != RequestStatus.Submitted) revert InvalidStatus();
+        if (reasonHash == bytes32(0)) revert InvalidHash();
 
         aidRequest.verifier = msg.sender;
         aidRequest.status = RequestStatus.Rejected;
@@ -185,8 +242,9 @@ contract SanadProtocol {
         emit RequestRejected(requestId, msg.sender, reasonHash);
     }
 
-    function fundRequest(uint256 requestId, uint256 amount) external nonReentrant {
+    function fundRequest(uint256 requestId, uint256 amount) external nonReentrant whenNotPaused {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (
             aidRequest.status != RequestStatus.Verified &&
             aidRequest.status != RequestStatus.Funded
@@ -208,8 +266,9 @@ contract SanadProtocol {
         emit RequestFunded(requestId, msg.sender, amount);
     }
 
-    function payProvider(uint256 requestId) external nonReentrant {
+    function payProvider(uint256 requestId) external nonReentrant whenNotPaused {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (aidRequest.status != RequestStatus.Funded) revert InvalidStatus();
         if (
             msg.sender != aidRequest.beneficiary &&
@@ -217,14 +276,16 @@ contract SanadProtocol {
             !approvedVerifiers[msg.sender]
         ) revert InvalidStatus();
 
+        uint256 payoutAmount = aidRequest.fundedAmount;
         aidRequest.status = RequestStatus.Paid;
-        IERC20(aidRequest.token).safeTransfer(aidRequest.provider, aidRequest.fundedAmount);
+        IERC20(aidRequest.token).safeTransfer(aidRequest.provider, payoutAmount);
 
-        emit RequestPaid(requestId, aidRequest.provider, aidRequest.fundedAmount);
+        emit RequestPaid(requestId, aidRequest.provider, payoutAmount);
     }
 
-    function cancelRequest(uint256 requestId) external {
+    function cancelRequest(uint256 requestId) external whenNotPaused {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (msg.sender != aidRequest.beneficiary) revert InvalidStatus();
         if (aidRequest.status != RequestStatus.Submitted) revert InvalidStatus();
 
@@ -234,6 +295,7 @@ contract SanadProtocol {
 
     function refundExpired(uint256 requestId) external nonReentrant {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         if (block.timestamp <= aidRequest.deadline) revert NotExpired();
         if (
             aidRequest.status != RequestStatus.Verified &&
@@ -273,6 +335,7 @@ contract SanadProtocol {
         )
     {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         return (
             aidRequest.beneficiary,
             aidRequest.provider,
@@ -299,6 +362,7 @@ contract SanadProtocol {
         )
     {
         AidRequest storage aidRequest = requests[requestId];
+        _requireRequest(aidRequest);
         return (
             aidRequest.createdAt,
             aidRequest.category,
@@ -306,5 +370,9 @@ contract SanadProtocol {
             aidRequest.verificationHash,
             aidRequest.memoId
         );
+    }
+
+    function _requireRequest(AidRequest storage aidRequest) private view {
+        if (aidRequest.beneficiary == address(0)) revert InvalidRequest();
     }
 }

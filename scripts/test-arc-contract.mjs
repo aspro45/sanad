@@ -35,8 +35,11 @@ const sanadAbi = parseAbi([
   "function requestCount() view returns (uint256)",
   "function approvedProviders(address) view returns (bool)",
   "function approvedVerifiers(address) view returns (bool)",
+  "function approvedTokens(address) view returns (bool)",
+  "function tokenMaxRequestAmount(address) view returns (uint256)",
   "function setProvider(address provider, bool approved)",
   "function setVerifier(address verifier, bool approved)",
+  "function setToken(address token, bool approved, uint256 maxRequestAmount)",
   "function submitRequest(address provider, address token, uint256 amount, bytes32 category, bytes32 metadataHash, bytes32 memoId, uint256 deadline) returns (uint256)",
   "function verifyRequest(uint256 requestId, bytes32 verificationHash)",
   "function fundRequest(uint256 requestId, uint256 amount)",
@@ -85,6 +88,12 @@ await writeAndWait("setVerifier", {
   functionName: "setVerifier",
   args: [account.address, true],
 });
+await writeAndWait("setToken", {
+  address: contractAddress,
+  abi: sanadAbi,
+  functionName: "setToken",
+  args: [tokenAddress, true, 1_000_000_000_000n],
+});
 
 const providerOk = await publicClient.readContract({
   address: contractAddress,
@@ -98,8 +107,22 @@ const verifierOk = await publicClient.readContract({
   functionName: "approvedVerifiers",
   args: [account.address],
 });
+const tokenOk = await publicClient.readContract({
+  address: contractAddress,
+  abi: sanadAbi,
+  functionName: "approvedTokens",
+  args: [tokenAddress],
+});
+const tokenCap = await publicClient.readContract({
+  address: contractAddress,
+  abi: sanadAbi,
+  functionName: "tokenMaxRequestAmount",
+  args: [tokenAddress],
+});
 assertEqual(providerOk, true, "provider allowlist works");
 assertEqual(verifierOk, true, "verifier allowlist works");
+assertEqual(tokenOk, true, "token allowlist works");
+assertEqual(tokenCap > 0n, true, "token cap is configured");
 
 const requestId = countBefore + 1n;
 const amount = 1n;

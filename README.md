@@ -16,7 +16,7 @@
   |
   <a href="https://sanad-arc.vercel.app/#blog"><strong>Project blog</strong></a>
   |
-  <a href="https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a"><strong>Arcscan contract</strong></a>
+  <a href="https://testnet.arcscan.app/address/0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03"><strong>Arcscan contract</strong></a>
   |
   <a href="docs/demo-proof.md"><strong>Testnet proof</strong></a>
   |
@@ -57,9 +57,9 @@ The public chain sees the settlement facts: provider, token, amount, request sta
 | Network | Arc Testnet |
 | Chain ID | `5042002` |
 | RPC | `https://rpc.testnet.arc.network` |
-| Contract | `0x222df65e3f6f5840d14b04f352eb647201064d6a` |
-| Contract page | https://testnet.arcscan.app/address/0x222df65e3f6f5840d14b04f352eb647201064d6a |
-| Deploy tx | `0x585602783a8a32cba8856e4b6f8ffd3e7365c36404684f8b6b2cf13a29b3f462` |
+| Contract | `0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03` |
+| Contract page | https://testnet.arcscan.app/address/0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03 |
+| Deploy tx | `0x7ab6533246b769ee2bc009e69519daf6fad45495daf16962c79ceb2dac4025a5` |
 | Test USDC interface | `0x3600000000000000000000000000000000000000` |
 | Test EURC interface | `0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a` |
 
@@ -69,13 +69,14 @@ This deployment has a real end-to-end lifecycle proof on Arc Testnet. Request `1
 
 | Step | Contract action | Public proof |
 | --- | --- | --- |
-| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0x5292221167cb3c9a8a1adab7374196d1a1f927ceed90f0c1971ea964cc2f1126) |
-| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0xe7408d81c48269a9494a8f22bf3703a6ddf80ecad6bd6dd2c61709848745b254) |
-| 3 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0x4be79509e05c854ea7cb734b15cbdac4752ada196c6f55ad6afb68c70b96baf7) |
-| 4 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x161baa463188f487289aeec408343e6271f8d894effeb815e2318745ff2a8367) |
-| 5 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0xf4f05308d513acfd87abff18e85012db0cb41360a97fb7e98273b18086ba2be2) |
-| 6 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0x4512b05e25c1b866f9f90382f32eb94c8f3b5050ad8653fad390ffe3a529cb3b) |
-| 7 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0xdb2bdc949d99f8d27da54bb3bb5c250c39cd0e6daa117638cd8e89bfab97602d) |
+| 1 | Allow provider | [`setProvider`](https://testnet.arcscan.app/tx/0x9a361d9caf5bc1d284e7bb2de6bd42dbcbf8f5d56955612cfa98a9ac8ea3b1d4) |
+| 2 | Allow verifier | [`setVerifier`](https://testnet.arcscan.app/tx/0xa99ac0900346309f935ce451161153438dbaefcd3457add822758da75edb1b03) |
+| 3 | Allow USDC test token | [`setToken`](https://testnet.arcscan.app/tx/0x0f130bb60b29959675c343146d64b47b8131087e7219da56362209b597f2a1a1) |
+| 4 | Submit aid request | [`submitRequest`](https://testnet.arcscan.app/tx/0x57e8a3ed859a1ff9c0576b96978434056dd688211e9f1d677758593744246ac3) |
+| 5 | Verify request | [`verifyRequest`](https://testnet.arcscan.app/tx/0x005720f4091e981194464da6fa93fea018cf4f8d2ba44d16f582de4429e88560) |
+| 6 | Approve escrow transfer | [`approve`](https://testnet.arcscan.app/tx/0xb0e8386100112feb58a46f3d57f267dd57a634e64d5411780d4e52e977cdcd73) |
+| 7 | Fund request | [`fundRequest`](https://testnet.arcscan.app/tx/0x8d716e825c5aa417bae19eed064967fb766278f86fb34cf932c9a8129e959aba) |
+| 8 | Pay provider | [`payProvider`](https://testnet.arcscan.app/tx/0x1bd8d79ad38c464566bd70e13b7b246f028134228d7b1c342b38163590a74c73) |
 
 Final state: `Paid`
 
@@ -132,11 +133,17 @@ flowchart LR
 
 - Provider allowlist.
 - Verifier allowlist.
+- Token allowlist with per-token max request cap.
+- Emergency pause for sensitive state transitions.
+- Two-step ownership transfer.
 - Aid request creation.
 - Verification and rejection.
 - Partial donor funding.
 - Direct provider payout.
 - Expired-request refunds.
+- Request existence checks.
+- Deadline range checks.
+- Non-zero category, metadata, memo, verification, and rejection hashes.
 - Reentrancy guard around token movement.
 - Safe ERC-20 transfer handling for tokens that return `false`, revert, or return no boolean.
 
@@ -156,6 +163,10 @@ Core writes:
 ```solidity
 setProvider(address provider, bool approved)
 setVerifier(address verifier, bool approved)
+setToken(address token, bool approved, uint256 maxRequestAmount)
+setPaused(bool shouldPause)
+transferOwnership(address newOwner)
+acceptOwnership()
 submitRequest(address provider, address token, uint256 amount, bytes32 category, bytes32 metadataHash, bytes32 memoId, uint256 deadline)
 verifyRequest(uint256 requestId, bytes32 verificationHash)
 rejectRequest(uint256 requestId, bytes32 reasonHash)
@@ -191,7 +202,7 @@ Public frontend values:
 ```text
 VITE_ARC_RPC_URL=https://rpc.testnet.arc.network
 VITE_ARC_CHAIN_ID=5042002
-VITE_SANAD_CONTRACT_ADDRESS=0x222df65e3f6f5840d14b04f352eb647201064d6a
+VITE_SANAD_CONTRACT_ADDRESS=0xbf1ec5dc0ed9ca9356a2d5531894eaefdf111a03
 ```
 
 Private deployment/testing value:
@@ -277,8 +288,14 @@ Implemented now:
 - `check:repo-safe` scans the repo for private-key style secrets.
 - Contract stores hashes and memo IDs, not raw private evidence.
 - Provider and verifier roles are allowlisted.
+- Tokens are allowlisted with max request caps.
+- Emergency pause is available for submit, verify, reject, fund, pay, and cancel flows.
+- Ownership uses a two-step handoff to reduce wrong-address transfers.
+- Missing request IDs revert instead of mutating empty storage.
+- Deadlines are bounded between 1 hour and 90 days.
+- Proof hashes must be non-zero.
 - Token movement uses a reentrancy guard.
-- Local contract tests cover owner checks, allowlists, submit, verify, fund, payout, cancel, reject, and refund paths.
+- Local contract tests cover owner checks, allowlists, token caps, pause, missing requests, submit, verify, fund, payout, cancel, reject, refund, and ownership transfer paths.
 
 Required before real funds:
 
