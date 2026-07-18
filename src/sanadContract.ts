@@ -100,6 +100,7 @@ type NormalizedRequestProof = {
 const zeroAddress = "0x0000000000000000000000000000000000000000" as const;
 const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000" as const;
 const tokenDecimals = 6;
+const requestReadLimit = 20;
 const statusLabels: SanadStatus[] = [
   "Submitted",
   "Verified",
@@ -147,6 +148,8 @@ export const publicClient = createPublicClient({
   transport: http(ARC_TESTNET.rpcUrl),
 });
 
+type ContractReadRequest = Parameters<typeof publicClient.readContract>[0];
+
 export function hasSanadContract() {
   return Boolean(SANAD_CONTRACT_ADDRESS);
 }
@@ -167,33 +170,34 @@ export async function connectArcWallet() {
 }
 
 export async function loadSanadRequests(contractAddress = requireSanadAddress()) {
-  const count = (await publicClient.readContract({
+  const count = (await readContractWithRetry({
     address: contractAddress,
     abi: sanadAbi,
     functionName: "requestCount",
   })) as unknown as bigint;
 
-  const requestIds = Array.from({ length: Number(count) }, (_, index) => BigInt(index + 1)).reverse();
-  const requests = await Promise.all(
-    requestIds.map(async (requestId) => {
-      const [core, proof] = (await Promise.all([
-        publicClient.readContract({
-          address: contractAddress,
-          abi: sanadAbi,
-          functionName: "getRequestCore",
-          args: [requestId],
-        }),
-        publicClient.readContract({
-          address: contractAddress,
-          abi: sanadAbi,
-          functionName: "getRequestProof",
-          args: [requestId],
-        }),
-      ])) as [RawRequestCore, RawRequestProof];
+  const requestIds = Array.from({ length: Number(count) }, (_, index) => BigInt(index + 1))
+    .reverse()
+    .slice(0, requestReadLimit);
+  const requests: SanadAidRequest[] = [];
 
-      return normalizeRequest(Number(requestId), core, proof);
-    }),
-  );
+  for (const requestId of requestIds) {
+    const core = (await readContractWithRetry({
+      address: contractAddress,
+      abi: sanadAbi,
+      functionName: "getRequestCore",
+      args: [requestId],
+    })) as RawRequestCore;
+    await sleep(150);
+    const proof = (await readContractWithRetry({
+      address: contractAddress,
+      abi: sanadAbi,
+      functionName: "getRequestProof",
+      args: [requestId],
+    })) as RawRequestProof;
+    requests.push(normalizeRequest(Number(requestId), core, proof));
+    await sleep(150);
+  }
 
   return requests;
 }
@@ -403,12 +407,38 @@ async function ensureArcChain(provider: EIP1193Provider) {
 }
 
 async function nextSanadRequestId(contractAddress: Address) {
-  const count = (await publicClient.readContract({
+  const count = (await readContractWithRetry({
     address: contractAddress,
     abi: sanadAbi,
     functionName: "requestCount",
   })) as unknown as bigint;
   return Number(count) + 1;
+}
+
+async function readContractWithRetry(request: ContractReadRequest) {
+  const attempts = 4;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await publicClient.readContract(request);
+    } catch (error) {
+      if (!isRpcRateLimitError(error) || attempt === attempts - 1) {
+        throw error;
+      }
+      await sleep(700 * (attempt + 1));
+    }
+  }
+  throw new Error("Arc RPC read failed.");
+}
+
+function isRpcRateLimitError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return /request limit|rate limit|too many requests|429/i.test(message);
+}
+
+function sleep(milliseconds: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
 }
 
 function normalizeRequest(

@@ -230,7 +230,11 @@ function timeLabel() {
 }
 
 function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "Unknown contract error.";
+  const message = error instanceof Error ? error.message : "Unknown contract error.";
+  if (/request limit|rate limit|too many requests|429/i.test(message)) {
+    return "Arc public RPC is rate limited right now. Wait a moment, then sync again.";
+  }
+  return message.length > 220 ? `${message.slice(0, 220)}...` : message;
 }
 
 function amountLabel(value: number, token = "USDC") {
@@ -308,8 +312,6 @@ export default function App() {
         );
         if (announce) pushEvent("Arc state synced", "Latest contract state loaded.");
       } catch (error) {
-        setRequests([]);
-        setSelectedId(0);
         setSystemMessage(errorMessage(error));
         pushEvent("Arc read failed", errorMessage(error));
       } finally {
